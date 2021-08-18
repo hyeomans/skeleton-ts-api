@@ -1,0 +1,46 @@
+{
+  "name": "skeleton-ts-api",
+  "version": "0.1.0",
+  "author": "Hector Yeomans",
+  "description": "My skeleton Typescript Express API",
+  "license": "MIT",
+  "keywords": [],
+  "main": "index.js",
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn lint"
+    }
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "lint": "eslint src/**/*.ts --fix",
+    "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
+    "preinstall": "npx only-allow pnpm",
+    "cli": "npx ts-node-dev --respawn src/cli"
+  },
+  "dependencies": {
+    "argon2": "0.28.2",
+    "dotenv": "10.0.0",
+    "pg": "8.7.1",
+    "reflect-metadata": "0.1.13",
+    "typeorm": "0.2.37"
+  },
+  "devDependencies": {
+    "@types/inquirer": "7.3.3",
+    "@types/node": "16.6.1",
+    "@typescript-eslint/eslint-plugin": "4.29.2",
+    "@typescript-eslint/parser": "4.29.2",
+    "eslint": "7.32.0",
+    "eslint-config-prettier": "8.3.0",
+    "eslint-plugin-prettier": "3.4.0",
+    "husky": "7.0.1",
+    "inquirer": "8.1.2",
+    "nodemon": "2.0.12",
+    "only-allow": "1.0.0",
+    "prettier": "2.3.2",
+    "ts-node": "10.2.0",
+    "ts-node-dev": "1.1.8",
+    "typescript": "4.3.5"
+  }
+}
