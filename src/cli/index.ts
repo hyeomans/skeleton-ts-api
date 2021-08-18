@@ -26,7 +26,7 @@ const initChoices = (services: IServices) => {
           message: 'Type the desired password:',
         },
       ])
-      const result = await services.createNewEmailAccount(email, password)
+      const result = await services.createNewEmailAccount({ email, password })
       return result
     },
   }

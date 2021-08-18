@@ -1,6 +1,6 @@
 {
   "name": "skeleton-ts-api",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Hector Yeomans",
   "description": "My skeleton Typescript Express API",
   "license": "MIT",
@@ -20,6 +20,8 @@
     "cli": "npx ts-node-dev --respawn src/cli"
   },
   "dependencies": {
+    "ajv": "8.6.2",
+    "ajv-formats": "2.1.1",
     "argon2": "0.28.2",
     "dotenv": "10.0.0",
     "pg": "8.7.1",

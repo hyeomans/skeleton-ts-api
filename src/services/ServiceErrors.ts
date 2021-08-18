@@ -1,3 +1,4 @@
+import { ErrorObject } from 'ajv'
 export class NotFoundServiceError extends Error {
   constructor(message: string) {
     super()
@@ -22,10 +23,13 @@ export class ServiceError extends Error {
   }
 }
 
-// export class ValidationError extends Error {
-//   constructor(validationErrors: Array<string>) {
-//     super()
-//     this.name = 'Validation Error:'
-//     this.message = validationErrors.map((e) => `property: ${e.schemaPath} - message: ${e.message}.`).join('|')
-//   }
-// }
+export class ValidationError extends Error {
+  constructor(validationErrors?: null | ErrorObject[]) {
+    super()
+    this.name = 'Validation Error:'
+    this.message =
+      (validationErrors &&
+        validationErrors.map((e) => `property: ${e.schemaPath} - message: ${e.message}.`).join('|')) ||
+      'No input from ajv for validation error.'
+  }
+}
