@@ -5,8 +5,7 @@ import { Connection } from 'typeorm'
 import { ServiceError, UnexpectedError, ValidationError } from './ServiceErrors'
 import Ajv from 'ajv'
 import { Logger } from 'pino'
-
-const salt = Buffer.from(process.env.SALT || 'somesaltingtodo') //TODO: Move to config file and inject
+import { IConfig } from 'config'
 
 const schema = {
   type: 'object',
@@ -18,7 +17,7 @@ const schema = {
   additionalProperties: false,
 }
 
-const createNewEmailAccount = (dbConnection: Connection, ajv: Ajv, logger: Logger) => {
+const createNewEmailAccount = (dbConnection: Connection, ajv: Ajv, logger: Logger, config: IConfig) => {
   const validate = ajv.compile(schema)
   return async (input: { email: string; password: string }) => {
     try {
@@ -26,7 +25,7 @@ const createNewEmailAccount = (dbConnection: Connection, ajv: Ajv, logger: Logge
       if (!isValid) {
         throw new ValidationError(validate.errors)
       }
-      const passwordHash = await argon.hash(input.password, { salt })
+      const passwordHash = await argon.hash(input.password, { salt: config.salt })
 
       const result = await dbConnection.transaction(async (transactionalEntityManager) => {
         const account = new Account()
