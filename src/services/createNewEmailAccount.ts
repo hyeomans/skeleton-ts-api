@@ -4,6 +4,9 @@ import { AccountEmail } from '../db/entity/AccountEmail'
 import { Connection } from 'typeorm'
 import { ServiceError, UnexpectedError, ValidationError } from './ServiceErrors'
 import Ajv from 'ajv'
+import { Logger } from 'pino'
+
+const salt = Buffer.from(process.env.SALT || 'somesaltingtodo') //TODO: Move to config file and inject
 
 const schema = {
   type: 'object',
@@ -15,7 +18,7 @@ const schema = {
   additionalProperties: false,
 }
 
-const createNewEmailAccount = (connection: Connection, ajv: Ajv) => {
+const createNewEmailAccount = (dbConnection: Connection, ajv: Ajv, logger: Logger) => {
   const validate = ajv.compile(schema)
   return async (input: { email: string; password: string }) => {
     try {
@@ -23,9 +26,9 @@ const createNewEmailAccount = (connection: Connection, ajv: Ajv) => {
       if (!isValid) {
         throw new ValidationError(validate.errors)
       }
-      const passwordHash = await argon.hash(input.password)
+      const passwordHash = await argon.hash(input.password, { salt })
 
-      const result = await connection.transaction(async (transactionalEntityManager) => {
+      const result = await dbConnection.transaction(async (transactionalEntityManager) => {
         const account = new Account()
         account.email = input.email
 
@@ -40,6 +43,8 @@ const createNewEmailAccount = (connection: Connection, ajv: Ajv) => {
         const accountId: number = transactionalEntityManager.getId(account)
         return { accountId }
       })
+
+      //TODO: Send email
       return result
     } catch (e) {
       if (e instanceof ValidationError) {
@@ -49,6 +54,8 @@ const createNewEmailAccount = (connection: Connection, ajv: Ajv) => {
       if (e.name === 'QueryFailedError') {
         throw new ServiceError('DuplicatedEmail', `${e.detail} on table: ${e.table}`)
       }
+
+      logger.error(e, `Email: ${input.email}`)
       throw new UnexpectedError(`unexpected error on create new email account transaction. Email ${input.email}`)
     }
   }

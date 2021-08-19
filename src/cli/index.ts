@@ -3,6 +3,7 @@ import inquirer from 'inquirer'
 import ormConfig from '../db/ormconfig'
 import { createConnection } from 'typeorm'
 import initServices, { IServices } from '../services'
+import logger from '../logger'
 
 const isDev = process.env.NODE_ENV !== 'production'
 
@@ -34,7 +35,7 @@ const initChoices = (services: IServices) => {
 
 async function main() {
   const connection = await createConnection(ormConfig)
-  const services = await initServices(connection)
+  const services = await initServices(connection, logger)
   const choices: Record<string, any> = initChoices(services)
 
   const answers = await inquirer.prompt({
