@@ -5,6 +5,7 @@ import { createConnection } from 'typeorm'
 import initServices, { IServices } from '../services'
 import logger from '../logger'
 import config from '../config'
+import initTasks from '../tasks'
 
 const isDev = process.env.NODE_ENV !== 'production'
 
@@ -35,8 +36,9 @@ const initChoices = (services: IServices) => {
 }
 
 async function main() {
+  const tasks = initTasks(config, logger)
   const connection = await createConnection(ormConfig)
-  const services = await initServices(connection, logger, config)
+  const services = initServices(connection, logger, config, tasks)
   const choices: Record<string, any> = initChoices(services)
 
   const answers = await inquirer.prompt({
@@ -53,9 +55,7 @@ async function main() {
 main()
   .then((result) => {
     console.log('done', result)
-    process.exit(0)
   })
   .catch((e) => {
     console.log('error', e)
-    process.exit(1)
   })

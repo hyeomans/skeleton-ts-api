@@ -6,6 +6,7 @@ import { ServiceError, UnexpectedError, ValidationError } from './ServiceErrors'
 import Ajv from 'ajv'
 import { Logger } from 'pino'
 import { IConfig } from 'config'
+import { ITasks } from '../tasks'
 
 const schema = {
   type: 'object',
@@ -17,7 +18,7 @@ const schema = {
   additionalProperties: false,
 }
 
-const createNewEmailAccount = (dbConnection: Connection, ajv: Ajv, logger: Logger, config: IConfig) => {
+const createNewEmailAccount = (dbConnection: Connection, ajv: Ajv, logger: Logger, config: IConfig, tasks: ITasks) => {
   const validate = ajv.compile(schema)
   return async (input: { email: string; password: string }) => {
     try {
@@ -43,7 +44,12 @@ const createNewEmailAccount = (dbConnection: Connection, ajv: Ajv, logger: Logge
         return { accountId }
       })
 
-      //TODO: Send email
+      const job = await tasks.emailsQueue.add(`sending email to ${input.email}`, {
+        to: input.email,
+        from: 'test@test.com',
+      })
+
+      logger.debug(`job id: ${job.id}`)
       return result
     } catch (e) {
       if (e instanceof ValidationError) {
